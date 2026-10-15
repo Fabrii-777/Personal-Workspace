@@ -8,6 +8,7 @@ import { Notes } from './pages/Notes';
 import { Goals } from './pages/Goals';
 import { Projects } from './pages/Projects';
 import { Wishlist } from './pages/Wishlist';
+import { Explore } from './pages/Explore';
 import { Profile } from './pages/Profile';
 import { PublicProfile } from './pages/PublicProfile';
 import { Auth } from './pages/Auth';
@@ -44,10 +45,11 @@ export const App: React.FC = () => {
               <Route path="goals" element={<Goals />} />
               <Route path="projects" element={<Projects />} />
               <Route path="wishlist" element={<Wishlist />} />
+              <Route path="explore" element={<Explore />} />
               <Route path="profile" element={<Profile />} />
             </Route>
 
-            {/* Redirección */}
+            {/* Redirección por defecto */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

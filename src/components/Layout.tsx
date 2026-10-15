@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, Target, FolderGit2, ShoppingBag, User, Sun, Moon, LogOut, Menu, X, Search, Sparkles } from 'lucide-react';
+import { LayoutDashboard, FileText, Target, FolderGit2, ShoppingBag, User, Sun, Moon, LogOut, Menu, X, Search, Sparkles, Compass } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { GlobalSearchModal } from './GlobalSearchModal';
@@ -20,6 +20,7 @@ export const Layout: React.FC = () => {
     { name: 'Objetivos', path: '/goals', icon: Target },
     { name: 'Proyectos', path: '/projects', icon: FolderGit2 },
     { name: 'Lista de Deseos', path: '/wishlist', icon: ShoppingBag },
+    { name: 'Explorar Comunidad', path: '/explore', icon: Compass },
     { name: 'Mi Perfil', path: '/profile', icon: User },
   ];
 
@@ -30,7 +31,6 @@ export const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors relative selection:bg-indigo-500 selection:text-white">
-      {/* Fondo Aurora animado ReactBits */}
       <AuroraBackground />
       <GlobalSearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
@@ -53,7 +53,7 @@ export const Layout: React.FC = () => {
         </div>
       </div>
 
-      {/* Barra Lateral Glassmorphic */}
+      {/* Barra Lateral */}
       <aside className={`fixed md:sticky top-0 h-screen z-40 w-64 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border-r border-slate-200/70 dark:border-slate-800/70 p-5 flex flex-col justify-between transition-transform duration-300 ${
         mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
       }`}>
@@ -110,7 +110,7 @@ export const Layout: React.FC = () => {
           </nav>
         </div>
 
-        {/* Panel Inferior con avatar animado */}
+        {/* Panel Inferior */}
         <div className="pt-4 border-t border-slate-200/70 dark:border-slate-800/70">
           <div className="flex items-center justify-between mb-3 px-2">
             <span className="text-xs text-slate-400 font-semibold">Aspecto</span>
@@ -143,7 +143,7 @@ export const Layout: React.FC = () => {
         </div>
       </aside>
 
-      {/* Contenido Principal con animación de entrada */}
+      {/* Contenido Principal */}
       <main className="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
         <Outlet />
       </main>
