@@ -12,7 +12,7 @@ export const Goals: React.FC = () => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Personal');
+  const [category] = useState('Personal');
   const [deadline, setDeadline] = useState('');
   const [priority, setPriority] = useState<Priority>('media');
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);

@@ -12,9 +12,9 @@ export const Wishlist: React.FC = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [currency, setCurrency] = useState<Currency>('PYG');
-  const [category, setCategory] = useState('Tecnología');
-  const [productUrl, setProductUrl] = useState('');
-  const [priority, setPriority] = useState<'baja' | 'media' | 'alta'>('media');
+  const [category] = useState('Tecnología');
+  const [productUrl] = useState('');
+  const [priority] = useState<'baja' | 'media' | 'alta'>('media');
 
   const fetchItems = async () => {
     if (!user) return;
