@@ -16,7 +16,7 @@ export interface Profile {
   technologies: string[];
   social_links: {
     github?: string;
-    linkedin?: string;
+    instagram?: string;
     twitter?: string;
     website?: string;
   };
