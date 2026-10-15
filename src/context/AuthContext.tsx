@@ -21,29 +21,25 @@ const AuthContext = createContext<AuthContextType>({
   refreshProfile: async () => {}
 });
 
-// Función para leer la sesión guardada al instante sin parpadeos
-const getSavedAuth = (): { user: User | null; session: Session | null } => {
-  try {
-    const keys = Object.keys(localStorage);
-    const authKey = keys.find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
-    if (authKey) {
-      const parsed = JSON.parse(localStorage.getItem(authKey) || '{}');
-      if (parsed?.user) {
-        return { user: parsed.user, session: parsed };
-      }
-    }
-  } catch (e) {
-    console.error('Error leyendo sesión de localStorage:', e);
-  }
-  return { user: null, session: null };
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const initialAuth = getSavedAuth();
-  const [user, setUser] = useState<User | null>(initialAuth.user);
-  const [session, setSession] = useState<Session | null>(initialAuth.session);
+  // Leemos la sesión existente para que el usuario nunca empiece en null
+  const [session, setSession] = useState<Session | null>(() => {
+    try {
+      const keys = Object.keys(localStorage);
+      const authKey = keys.find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+      if (authKey) {
+        const item = localStorage.getItem(authKey);
+        return item ? JSON.parse(item) : null;
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  });
+
+  const [user, setUser] = useState<User | null>(() => session?.user ?? null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState<boolean>(!initialAuth.user);
+  const [loading, setLoading] = useState<boolean>(!session?.user);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -62,28 +58,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
 
-    // 1. Validar sesión persistida
+    // 1. Verificar sesión activa
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      if (!mounted) return;
+      if (!isMounted) return;
       if (currentSession?.user) {
         setSession(currentSession);
         setUser(currentSession.user);
         fetchProfile(currentSession.user.id);
-      } else if (!initialAuth.user) {
-        setUser(null);
-        setSession(null);
       }
       setLoading(false);
     }).catch(() => {
-      if (mounted) setLoading(false);
+      if (isMounted) setLoading(false);
     });
 
-    // 2. Escuchar cambios de autenticación
+    // 2. Escuchador de eventos
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-      if (!mounted) return;
+      if (!isMounted) return;
 
+      // SOLO cerramos sesión si el usuario dio clic en Cerrar Sesión expresamente
       if (event === 'SIGNED_OUT') {
         setUser(null);
         setSession(null);
@@ -94,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(newSession);
         setLoading(false);
         setTimeout(() => {
-          if (mounted && newSession?.user?.id) {
+          if (isMounted && newSession?.user?.id) {
             fetchProfile(newSession.user.id);
           }
         }, 0);
@@ -102,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => {
-      mounted = false;
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, []);
