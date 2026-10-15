@@ -12,9 +12,9 @@ export const Wishlist: React.FC = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [currency, setCurrency] = useState<Currency>('PYG');
-  const [category] = useState('Tecnología');
-  const [productUrl] = useState('');
-  const [priority] = useState<'baja' | 'media' | 'alta'>('media');
+  const [category, setCategory] = useState('Tecnología');
+  const [productUrl, setProductUrl] = useState('');
+  const [priority, setPriority] = useState<'baja' | 'media' | 'alta'>('media');
 
   const fetchItems = async () => {
     if (!user) return;
@@ -45,6 +45,8 @@ export const Wishlist: React.FC = () => {
     setName('');
     setPrice(0);
     setProductUrl('');
+    setCategory('Tecnología');
+    setPriority('media');
     fetchItems();
   };
 
@@ -180,6 +182,31 @@ export const Wishlist: React.FC = () => {
                   className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-indigo-500"
                 />
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Categoría</label>
+                  <input
+                    type="text"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Prioridad</label>
+                  <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value as 'baja' | 'media' | 'alta')}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-indigo-500"
+                  >
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                  </select>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Precio Estimado</label>
@@ -204,6 +231,7 @@ export const Wishlist: React.FC = () => {
                   </select>
                 </div>
               </div>
+
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Enlace del Producto (Opcional)</label>
                 <input
@@ -214,6 +242,7 @@ export const Wishlist: React.FC = () => {
                   className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-indigo-500"
                 />
               </div>
+
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">
                   Cancelar
