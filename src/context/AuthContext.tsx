@@ -35,32 +35,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .single();
 
-      if (!error && data) setProfile(data);
+      if (!error && data) {
+        setProfile(data);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Error cargando perfil:', err);
     }
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
-      setLoading(false);
-    });
+    let mounted = true;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
+    // 1. Obtener la sesión almacenada en el navegador
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      if (!mounted) return;
+      if (currentSession?.user) {
+        setSession(currentSession);
+        setUser(currentSession.user);
+        fetchProfile(currentSession.user.id);
       }
       setLoading(false);
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // 2. Escuchar cambios de sesión de forma segura
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (!mounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        // Solo aquí limpiamos al usuario
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+      } else if (newSession?.user) {
+        // Si hay una sesión activa o refresco de token, la mantenemos firme
+        setUser(newSession.user);
+        setSession(newSession);
+        setLoading(false);
+        // Evitamos el deadlock ejecutando la consulta en el siguiente ciclo
+        setTimeout(() => {
+          if (mounted && newSession?.user?.id) {
+            fetchProfile(newSession.user.id);
+          }
+        }, 0);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const refreshProfile = async () => {
@@ -68,6 +94,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    setUser(null);
+    setSession(null);
+    setProfile(null);
     await supabase.auth.signOut();
   };
 
