@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Lock, Mail, User, Sparkles } from 'lucide-react';
 import { SpotlightCard } from '../components/Reactbits/SpotlightCard';
 import { ShinyText } from '../components/Reactbits/ShinyText';
+import { useAuth } from '../context/AuthContext';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -27,6 +28,7 @@ const GoogleIcon = () => (
 );
 
 export const Auth: React.FC = () => {
+  const { user } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,6 +36,13 @@ export const Auth: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // En cuanto Google confirma la sesión, entra automáticamente al panel
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   // Iniciar sesión con Google
   const handleGoogleSignIn = async () => {
@@ -96,7 +105,7 @@ export const Auth: React.FC = () => {
           <p className="text-xs text-slate-500 mt-1">Accede a tu espacio de proyectos, metas y notas</p>
         </div>
 
-        {/* Botón Principal: Google */}
+        {/* Botón Google */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
